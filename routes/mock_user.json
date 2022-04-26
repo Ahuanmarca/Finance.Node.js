@@ -1,0 +1,31 @@
+{
+    "portfolio": {
+        "aapl": {
+            "symbol": "APPL",
+            "name": "Apple Inc.",
+            "shares": "10",
+            "price": "162.88",
+            "total": "1628.80",
+            "outflow_balance": "100.00"
+        },
+        "goog": {
+            "symbol": "GOOG",
+            "name": "Alphabet Inc.",
+            "shares": "10",
+            "price": "2465.00",
+            "total": "24650.00",
+            "outflow_balance": "1000.00"
+        },
+        "sbux": {
+            "symbol": "SBUX",
+            "name": "Starbucks Corporations",
+            "shares": "10",
+            "price": "77.98",
+            "total": "779.80",
+            "outflow_balance": "50.00"
+        }
+    },
+    "cash": "1500.00",
+    "grandtotal": "28558.60"
+}
+
