@@ -1,0 +1,17 @@
+<% layout('layouts/layout') %>
+<!-- <h1>QUOTE</h1> -->
+
+<% if (symbol) {%>
+    
+    <p>A share of <%= symbol.name %>  (<%= symbol.symbol %>)  costs <%= usd(symbol.price) %>.</p>
+    
+    <%} else {%>
+        
+    <form action="/finance/quote" method="GET">
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="symbol" placeholder="Symbol" type="text">
+        </div>
+        <button class="btn btn-primary" type="submit">Quote</button>
+    </form>
+
+<% } %> 

@@ -17,6 +17,8 @@ app.engine('ejs', ejsMate);
 // MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
+
+
 // app.use(express.static(path.join(__dirname, 'public')));
 
 // ROUTES MIDDLEWARE
