@@ -9,7 +9,7 @@ const usd = require('../helpers/usd.js');
 const SESSION_ID = 1;
 
 
-router.get('/finance/history', async (req, res) => {
+router.get('/history', async (req, res) => {
 
     // Get history from current user
     const user_history = await prisma.transacciones.findMany({

@@ -9,7 +9,17 @@ const usd = require('../helpers/usd.js');
 const SESSION_ID = 1;
 
 
-router.get('/finance/quote', async (req, res) => {
+/*
+     ██████╗     ██╗   ██╗     ██████╗     ████████╗    ███████╗
+    ██╔═══██╗    ██║   ██║    ██╔═══██╗    ╚══██╔══╝    ██╔════╝
+    ██║   ██║    ██║   ██║    ██║   ██║       ██║       █████╗  
+    ██║▄▄ ██║    ██║   ██║    ██║   ██║       ██║       ██╔══╝  
+    ╚██████╔╝    ╚██████╔╝    ╚██████╔╝       ██║       ███████╗
+    ╚══▀▀═╝      ╚═════╝      ╚═════╝        ╚═╝       ╚══════╝
+*/
+
+
+router.get('/quote', async (req, res) => {
 
     let query = req.query.symbol;
 

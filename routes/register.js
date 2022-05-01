@@ -9,13 +9,22 @@ const usd = require('../helpers/usd.js');
 const SESSION_ID = 1;
 
 
+/*
+    ██████╗     ███████╗     ██████╗     ██╗    ███████╗    ████████╗    ███████╗    ██████╗ 
+    ██╔══██╗    ██╔════╝    ██╔════╝     ██║    ██╔════╝    ╚══██╔══╝    ██╔════╝    ██╔══██╗
+    ██████╔╝    █████╗      ██║  ███╗    ██║    ███████╗       ██║       █████╗      ██████╔╝
+    ██╔══██╗    ██╔══╝      ██║   ██║    ██║    ╚════██║       ██║       ██╔══╝      ██╔══██╗
+    ██║  ██║    ███████╗    ╚██████╔╝    ██║    ███████║       ██║       ███████╗    ██║  ██║
+    ╚═╝  ╚═╝    ╚══════╝     ╚═════╝     ╚═╝    ╚══════╝       ╚═╝       ╚══════╝    ╚═╝  ╚═╝
+*/
 
-router.get('/finance/register', (req, res) => {
+
+router.get('/register', (req, res) => {
     console.log("Route: Register - GET (render register template)");
     res.render('finance/register');
 });
 
-router.post('/finance/register', (req, res) => {
+router.post('/register', (req, res) => {
     console.log("Route: Register - POST (register user data");
     res.redirect('/');
 })

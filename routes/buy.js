@@ -8,11 +8,22 @@ const usd = require('../helpers/usd.js');
 
 const SESSION_ID = 1;
 
-router.get('/finance/buy', (req, res) => {
+
+/*
+    ██████╗     ██╗   ██╗    ██╗   ██╗
+    ██╔══██╗    ██║   ██║    ╚██╗ ██╔╝
+    ██████╔╝    ██║   ██║     ╚████╔╝ 
+    ██╔══██╗    ██║   ██║      ╚██╔╝  
+    ██████╔╝    ╚██████╔╝       ██║   
+    ╚═════╝      ╚═════╝        ╚═╝    
+*/
+
+
+router.get('/buy', (req, res) => {
     res.render('finance/buy')
 }); // ✔️
 
-router.post('/finance/buy', async (req, res) => {
+router.post('/buy', async (req, res) => {
     
     // BUY SHARES OF STOCK
 
@@ -153,13 +164,11 @@ router.post('/finance/buy', async (req, res) => {
 
     // Redirect to index (FALTA FLASH MESSAGE""")
     console.log("Buy succesfull!")
-    res.redirect('/finance');
+    res.redirect('/finance/index');
 }); // ✔️:⭐⭐
-// TODO:
-// - Handle invalid characters in "symbol" field
-// - Handle franctional or negative values in "shares" field
-// - Flash message when operation is complete
-// - Render apology template instead of res.send
+// TODO: Handle invalid characters in "symbol" field
+// TODO: Handle franctional or negative values in "shares" field
+// TODO: Flash message when operation is complete
 
 
 

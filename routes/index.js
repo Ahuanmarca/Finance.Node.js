@@ -1,12 +1,7 @@
 const { Router } = require('express');
 const router = Router();
-// const router = require('..helpers/router.js');
 
-// const { PrismaClient } = require('@prisma/client');
-// const prisma = new PrismaClient();
 const prisma = require('../helpers/client.js');
-
-
 
 // Helper functions
 //      TODO: JOIN IN A SINGLE FILE LATER
@@ -14,16 +9,42 @@ const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
 
 // MOCK USER DATA
-const SESSION_ID = 1;
+let SESSION_ID = 1;
+let SESSION_LOGGED = true;
 
+
+// router.use((req, res, next) => {
+//     if (SESSION_LOGGED) {
+//         next();
+//     } else {
+//         res.redirect('/finance/login'); // ! THIS CAUSES "TOO MANY REDIRECTS" ERROR ☹️
+//         return;
+//     }
+// });
+
+
+
+
+/*
+    ██╗    ███╗   ██╗    ██████╗     ███████╗    ██╗  ██╗
+    ██║    ████╗  ██║    ██╔══██╗    ██╔════╝    ╚██╗██╔╝
+    ██║    ██╔██╗ ██║    ██║  ██║    █████╗       ╚███╔╝ 
+    ██║    ██║╚██╗██║    ██║  ██║    ██╔══╝       ██╔██╗ 
+    ██║    ██║ ╚████║    ██████╔╝    ███████╗    ██╔╝ ██╗
+    ╚═╝    ╚═╝  ╚═══╝    ╚═════╝     ╚══════╝    ╚═╝  ╚═╝
+*/
 
 
 router.get('/', (req, res) => {
-    res.redirect('/finance');
+    if (!SESSION_LOGGED) res.redirect('/finance/login');
+    res.redirect('/finance/index');
 }); // ✔️
 
-router.get('/finance', async (req, res) => {
+router.get('/index', async (req, res) => {
     
+    // TODO: Hacer esto con middleware
+    if (!SESSION_LOGGED) res.redirect('/finance/login');
+
     // SHOW PORTFOLIO STOCKS
     // 1) Sacar de la base de datos SYMBOLS y SHARES del usuario
     // 2) Usar los symbols para obtener los nombres y los precios actuales de cada SYMBOL
@@ -110,7 +131,7 @@ router.get('/finance', async (req, res) => {
 
 
 
-router.get('/finance/logout', (req, res) => {
+router.get('/logout', (req, res) => {
     console.log("Route: Logout - GET");
     res.redirect('/');
 });

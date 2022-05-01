@@ -11,12 +11,12 @@ const SESSION_ID = 1;
 
 
 
-router.get('/finance/changePassword', (req, res) => {
+router.get('/changePassword', (req, res) => {
     console.log("Route: Change Password - GET (render change password template");
     res.render('finance/changePassword');
 })
 
-router.patch('/finance/changePassword', (req, res) => {
+router.patch('/changePassword', (req, res) => {
     console.log("Route: Change Password - PATCH (update database");
     res.redirect('/');
 })

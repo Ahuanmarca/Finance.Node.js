@@ -12,7 +12,7 @@ async function lookup(symbol) {
         const response = await axios.get(url);
         const data = response.data;
         // Parse response
-        console.log(data.latestPrice);
+        // console.log(data.latestPrice);
         return {
             name: data.companyName,
             price: data.latestPrice,
