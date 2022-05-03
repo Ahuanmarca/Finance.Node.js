@@ -1,6 +1,7 @@
 <% layout('layouts/layout') %>
 <!-- <h1>BUY</h1> -->
 <form action="/finance/buy" method="post">
+    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
     <div class="mb-3">
         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" name="symbol" placeholder="Symbol" type="text">
     </div>

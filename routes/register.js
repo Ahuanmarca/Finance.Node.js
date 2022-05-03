@@ -1,16 +1,13 @@
 const { Router } = require('express');
-// const res = require('express/lib/response');
 const router = Router();
 const prisma = require('../helpers/client.js');
 const bcrypt = require('bcrypt');
 
-
-// Helper functions
-// const lookup = require('../helpers/lookup.js');
-// const usd = require('../helpers/usd.js');
-
-const SESSION_ID = 1;
-
+// CSRF PROTECTION 🗝️
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+router.use(cookieParser());
 
 /*
     ██████╗     ███████╗     ██████╗     ██╗    ███████╗    ████████╗    ███████╗    ██████╗ 
@@ -22,14 +19,15 @@ const SESSION_ID = 1;
 */
 
 
-router.get('/register', (req, res) => {
+router.get('/register', csrfProtection, (req, res) => {
     res.render('finance/register', {
         user: req.session.user_id,
-        username: req. session.username
+        username: req. session.username,
+        csrfToken: req.csrfToken()
     });
 });
 
-router.post('/register', async (req, res) => {
+router.post('/register', csrfProtection, async (req, res) => {
 
     const { username, password, confirmation } = req.body;
 
@@ -71,7 +69,5 @@ router.post('/register', async (req, res) => {
 
     res.redirect('/finance/index');
 })
-
-
 
 module.exports = router;

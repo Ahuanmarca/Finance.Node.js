@@ -1,8 +1,8 @@
 const { Router } = require('express');
-const session = require('express-session');
 const router = Router();
 
 const prisma = require('../helpers/client.js');
+
 
 // Helper functions
 const lookup = require('../helpers/lookup.js');
@@ -20,7 +20,8 @@ const requireLogin = require('../helpers/requireLogin.js');
 */
 
 
-router.get('/', requireLogin, (req, res) => res.redirect('/finance/index')); // ✔️
+router.get('/', (req, res) => res.redirect('/finance/index')); // ✔️
+
 router.get('/index', requireLogin, async (req, res) => {
 
     // SHOW PORTFOLIO STOCKS

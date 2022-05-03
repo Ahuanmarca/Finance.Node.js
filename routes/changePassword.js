@@ -3,10 +3,15 @@ const router = Router();
 const prisma = require('../helpers/client.js');
 const bcrypt = require('bcrypt');
 
+// CSRF PROTECTION 🗝️
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+router.use(cookieParser());
+
 // Helper functions
-// const lookup = require('../helpers/lookup.js');
-// const usd = require('../helpers/usd.js');
 const requireLogin = require('../helpers/requireLogin.js');
+const authenticate = require('../helpers/authenticate.js');
 
 /*
  ██████╗██╗  ██╗ █████╗ ███╗   ██╗ ██████╗ ███████╗                
@@ -23,26 +28,24 @@ const requireLogin = require('../helpers/requireLogin.js');
 ╚═╝     ╚═╝  ╚═╝╚══════╝╚══════╝ ╚══╝╚══╝  ╚═════╝ ╚═╝  ╚═╝╚═════╝ 
 */
 
-router.get('/changePassword', requireLogin, (req, res) => {
+router.get('/changePassword', requireLogin, csrfProtection, (req, res) => {
     res.render('finance/changePassword', {
         user: req.session.user_id,
-        username: req.session.username
+        username: req.session.username,
+        csrfToken: req.csrfToken()
     });
 })
 
-router.put('/changePassword', requireLogin, async (req, res) => {
+router.put('/changePassword', requireLogin, csrfProtection, async (req, res) => {
 
     const { oldPassword, newPassword, newPasswordConfirmation } = req.body;
 
     // Check if current password is correct
-    const user = await prisma.users.findUnique({
-        where: {
-            id: req.session.user_id
-        }
-    })
-    const validPassword = await bcrypt.compare(oldPassword, user.hash);
-    if (!validPassword) {
+    const auth = await authenticate({username: req.session.username, password: oldPassword});
+
+    if (!auth.validation) {
         res.send("Invalid Password");
+        return;
     }
 
     // Check if new password and confirmation match

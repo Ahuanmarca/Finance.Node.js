@@ -1,6 +1,6 @@
 const { Router } = require('express');
 const router = Router();
-const prisma = require('../helpers/client.js');
+// const prisma = require('../helpers/client.js');
 
 // Helper functions
 const lookup = require('../helpers/lookup.js');

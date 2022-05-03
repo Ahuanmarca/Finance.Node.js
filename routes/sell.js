@@ -2,11 +2,14 @@ const { Router } = require('express');
 const router = Router();
 const prisma = require('../helpers/client.js');
 
-// const session = require('express-session');
+// CSRF PROTECTION 🗝️
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+router.use(cookieParser());
 
 // Helper functions
 const lookup = require('../helpers/lookup.js');
-const usd = require('../helpers/usd.js');
 const requireLogin = require('../helpers/requireLogin.js')
 
 
@@ -20,7 +23,7 @@ const requireLogin = require('../helpers/requireLogin.js')
 */
 
 // ROUTE: RENDER SELL TEMPLATE
-router.get('/sell', requireLogin, async (req, res) => {
+router.get('/sell', requireLogin, csrfProtection, async (req, res) => {
 
     let user_data = await prisma.portfolios.findMany({
         where: {
@@ -36,14 +39,15 @@ router.get('/sell', requireLogin, async (req, res) => {
     res.render('finance/sell', {
         user_data,
         user: req.session.user_id,
-        username: req.session.username
+        username: req.session.username,
+        csrfToken: req.csrfToken()
     });
 }) // ✔️
 
 
 // ROUTE: HANDLE POST REQUEST FROM SELL FORM
 //      Perform the "Sell" by updating the database
-router.post('/sell', requireLogin, async (req, res) => {
+router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
 
     const { symbol, shares } = req.body;
 

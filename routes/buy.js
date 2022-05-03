@@ -2,6 +2,12 @@ const { Router } = require('express');
 const router = Router();
 const prisma = require('../helpers/client.js');
 
+// CSRF PROTECTION !!!! 🗝️
+const cookieParser = require('cookie-parser');
+const csrf = require('csurf');
+const csrfProtection = csrf({ cookie: true });
+router.use(cookieParser());
+
 // Helper functions
 const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
@@ -18,20 +24,20 @@ const requireLogin = require('../helpers/requireLogin.js');
 */
 
 
-router.get('/buy', requireLogin, (req, res) => {
+router.get('/buy', requireLogin, csrfProtection, (req, res) => {
     res.render('finance/buy', {
         user: req.session.user_id,
-        username: req.session.username
+        username: req.session.username,
+        csrfToken: req.csrfToken()
     })
 }); // ✔️
 
-router.post('/buy', requireLogin, async (req, res) => {
-    
+router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
+
     // BUY SHARES OF STOCK
 
     // Tomar input de usuario
     const { symbol, shares } = req.body;
-    // console.log(symbol, shares);
 
     // TODO: Handle invalid characters
     // ...
@@ -71,13 +77,13 @@ router.post('/buy', requireLogin, async (req, res) => {
         return;
     }
 
-    // DO BUY
-    //      INSERT into stocks, INSERT or UPDATE portfolios, INSERT into transacciones
+    // BUY !!
+    // INSERT into stocks, INSERT or UPDATE portfolios, INSERT into transacciones
 
     // Search symbol in stocks
     const stored_stock = await prisma.stocks.findFirst({
         where: {
-            symbol: symbol
+            symbol: symbol.toUpperCase()
         }
     })
 
@@ -85,7 +91,7 @@ router.post('/buy', requireLogin, async (req, res) => {
     if (!stored_stock) {
         const new_stock = await prisma.stocks.create({
             data: {
-                symbol: symbol,
+                symbol: symbol.toUpperCase(),
                 name: name
             }
         });
@@ -165,7 +171,7 @@ router.post('/buy', requireLogin, async (req, res) => {
     });
 
     // Redirect to index (FALTA FLASH MESSAGE""")
-    console.log("Buy succesfull!")
+    // console.log("Buy succesfull!")
     res.redirect('/finance/index');
 }); // ✔️:⭐⭐
 // TODO: Handle invalid characters in "symbol" field

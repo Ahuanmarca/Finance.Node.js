@@ -1,7 +1,5 @@
 const { Router } = require('express');
-const session = require('express-session');
 const router = Router();
-
 
 router.get('/logout', async (req, res) => {
 
