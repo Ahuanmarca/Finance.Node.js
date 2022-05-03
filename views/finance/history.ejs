@@ -16,26 +16,30 @@
         <tr>
             <td class="text-start"> <%= row.stocks.symbol %> </td>
             <td class="text-end"> <%= row.shares %> </td>
-            <td class="text-end"> <%= row.price %> </td>
-
-            <!-- FORMATEAR EL TIEMPO COMO STRING BONITO...
-            DEFINITIVAMENTE DEBE HABER UNA MEJOR FORMA!!! -->
-            <% let yy = row.p_datetime.getFullYear() %>
-            <% let mm = row.p_datetime.getMonth() %>
-            <% mm = (parseInt(mm) < 10 ? "0" + mm : mm) %> 
-            <% let dd = row.p_datetime.getDay() %>
-            <% dd = (parseInt(dd) < 10 ? "0" + dd : dd) %> 
-            <% let h = row.p_datetime.getHours() %>
-            <% h = (parseInt(h) < 10 ? "0" + h : h) %> 
-            <% let m = row.p_datetime.getMinutes() %>
-            <% m = (parseInt(m) < 10 ? "0" + m : m) %> 
-            <% let s = row.p_datetime.getSeconds() %>
-            <% s = (parseInt(s) < 10 ? "0" + s : s) %> 
-
-            <td class="text-end"> <%= `${yy}-${mm}-${dd} ${h}:${m}:${s}` %> </td>
+            <td class="text-end"> <%= usd(row.price) %> </td>
+            <td class="text-end"> <%= parseDateTime(row.p_datetime) %> </td>
         </tr>
         <% } %> 
     </tbody>
 
 
 </table>
+
+
+<!-- * LOGRÉ ELIMINAR TODO ESTE NOISE CON UN HELPER!! 😀 -->
+
+    <!-- FORMATEAR EL TIEMPO COMO STRING BONITO...
+    DEFINITIVAMENTE DEBE HABER UNA MEJOR FORMA!!! -->
+    <%# let yy = row.p_datetime.getFullYear() %>
+    <%# let mm = row.p_datetime.getMonth() %>
+    <%# mm = (parseInt(mm) < 10 ? "0" + mm : mm) %> 
+    <%# let dd = row.p_datetime.getDay() %>
+    <%# dd = (parseInt(dd) < 10 ? "0" + dd : dd) %> 
+    <%# let h = row.p_datetime.getHours() %>
+    <%# h = (parseInt(h) < 10 ? "0" + h : h) %> 
+    <%# let m = row.p_datetime.getMinutes() %>
+    <%# m = (parseInt(m) < 10 ? "0" + m : m) %> 
+    <%# let s = row.p_datetime.getSeconds() %>
+    <%# s = (parseInt(s) < 10 ? "0" + s : s) %> 
+
+    <!-- <td class="text-end"> <%#= `${yy}-${mm}-${dd} ${h}:${m}:${s}` %> </td> -->

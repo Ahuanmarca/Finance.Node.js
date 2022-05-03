@@ -3,18 +3,26 @@ const router = Router();
 const prisma = require('../helpers/client.js');
 
 // Helper functions
-const lookup = require('../helpers/lookup.js');
+// const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
+const requireLogin = require('../helpers/requireLogin.js');
+const parseDateTime = require('../helpers/parseDateTime');
 
-const SESSION_ID = 1;
+/*
+██╗  ██╗    ██╗    ███████╗    ████████╗     ██████╗     ██████╗     ██╗   ██╗
+██║  ██║    ██║    ██╔════╝    ╚══██╔══╝    ██╔═══██╗    ██╔══██╗    ╚██╗ ██╔╝
+███████║    ██║    ███████╗       ██║       ██║   ██║    ██████╔╝     ╚████╔╝ 
+██╔══██║    ██║    ╚════██║       ██║       ██║   ██║    ██╔══██╗      ╚██╔╝  
+██║  ██║    ██║    ███████║       ██║       ╚██████╔╝    ██║  ██║       ██║   
+╚═╝  ╚═╝    ╚═╝    ╚══════╝       ╚═╝        ╚═════╝     ╚═╝  ╚═╝       ╚═╝   
+*/
 
-
-router.get('/history', async (req, res) => {
+router.get('/history', requireLogin, async (req, res) => {
 
     // Get history from current user
     const user_history = await prisma.transacciones.findMany({
         where: {
-            user_id: SESSION_ID
+            user_id: req.session.user_id
         },
         include: {
             stocks: true
@@ -22,11 +30,15 @@ router.get('/history', async (req, res) => {
     });
 
     res.render('finance/history', {
-        user_history
+        user_history,
+        user: req.session.user_id,
+        username: req.session.username,
+        usd,
+        parseDateTime
     });
 }); // ✔️:⭐⭐
-// TODO:
-// - Find a better way to format the time string (currently done inside the template)
 
+// TODO: Find a better way to format the time string (currently done inside the template) - ✔️ Done!
+// Created a helper function that parses the date from the DB format to a nice string, then passed the function to the EJS template. Commented out the noise to the bottom, just as a nice reminder.
 
 module.exports = router;

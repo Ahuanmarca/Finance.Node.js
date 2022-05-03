@@ -5,8 +5,7 @@ const prisma = require('../helpers/client.js');
 // Helper functions
 const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
-
-const SESSION_ID = 1;
+const requireLogin = require('../helpers/requireLogin.js');
 
 
 /*
@@ -19,22 +18,25 @@ const SESSION_ID = 1;
 */
 
 
-router.get('/buy', (req, res) => {
-    res.render('finance/buy')
+router.get('/buy', requireLogin, (req, res) => {
+    res.render('finance/buy', {
+        user: req.session.user_id,
+        username: req.session.username
+    })
 }); // ✔️
 
-router.post('/buy', async (req, res) => {
+router.post('/buy', requireLogin, async (req, res) => {
     
     // BUY SHARES OF STOCK
 
     // Tomar input de usuario
     const { symbol, shares } = req.body;
-    console.log(symbol, shares);
+    // console.log(symbol, shares);
 
-    // Handle invalid characters
+    // TODO: Handle invalid characters
     // ...
 
-    // Handle fractional and negative values
+    // TODO: Handle fractional and negative values
     // ...
 
     // Lookup symbol and check if it's valid
@@ -53,7 +55,7 @@ router.post('/buy', async (req, res) => {
 
     const user_info = await prisma.users.findUnique({
         where: {
-            id: SESSION_ID
+            id: req.session.user_id
         }
     })
     
@@ -89,14 +91,14 @@ router.post('/buy', async (req, res) => {
         });
         const new_shares = await prisma.portfolios.create({
             data: {
-                user_id: SESSION_ID,
+                user_id: req.session.user_id,
                 stock_id: new_stock.id,
                 shares: parseInt(shares)
             }
         });
         const new_transaction = await prisma.transacciones.create({
             data: {
-                user_id: SESSION_ID,
+                user_id: req.session.user_id,
                 stock_id: new_stock.id,
                 shares: parseInt(shares),
                 price: price
@@ -108,7 +110,7 @@ router.post('/buy', async (req, res) => {
         // ... the user owns at least one share: UPDATE
         const owned_stock= await prisma.portfolios.findFirst({
             where: {
-                user_id: SESSION_ID,
+                user_id: req.session.user_id,
                 stock_id: stored_stock.id
             }
         })
@@ -116,14 +118,14 @@ router.post('/buy', async (req, res) => {
         if (!owned_stock) {
             const buy_shares = await prisma.portfolios.create({
                 data: {
-                    user_id: SESSION_ID,
+                    user_id: req.session.user_id,
                     stock_id: stored_stock.id,
                     shares: parseInt(shares)
                 }
             });
             const new_transaction = await prisma.transacciones.create({
                 data: {
-                    user_id: SESSION_ID,
+                    user_id: req.session.user_id,
                     stock_id: stored_stock.id,
                     shares: parseInt(shares),
                     price: price
@@ -133,7 +135,7 @@ router.post('/buy', async (req, res) => {
             const shares_new_total = parseInt(owned_stock.shares) + parseInt(shares);
             const new_shares = await prisma.portfolios.updateMany({
                 where: {
-                    user_id: SESSION_ID,
+                    user_id: req.session.user_id,
                     stock_id: owned_stock.stock_id
                 },
                 data: {
@@ -142,7 +144,7 @@ router.post('/buy', async (req, res) => {
             });
             const new_transaction = await prisma.transacciones.create({
                 data: {
-                    user_id: SESSION_ID,
+                    user_id: req.session.user_id,
                     stock_id: stored_stock.id,
                     shares: parseInt(shares),
                     price: price
@@ -155,7 +157,7 @@ router.post('/buy', async (req, res) => {
     cash = cash - spending;
     const new_cash_total = await prisma.users.update({
         where: {
-            id: SESSION_ID
+            id: req.session.user_id
         },
         data: {
             cash: parseFloat(cash)
@@ -169,7 +171,5 @@ router.post('/buy', async (req, res) => {
 // TODO: Handle invalid characters in "symbol" field
 // TODO: Handle franctional or negative values in "shares" field
 // TODO: Flash message when operation is complete
-
-
 
 module.exports = router;

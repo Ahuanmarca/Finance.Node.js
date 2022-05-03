@@ -7,11 +7,7 @@ const prisma = require('../helpers/client.js');
 // Helper functions
 const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
-
-// Middleware
-// router.use(session({secret:"notSecret"}));
-
-const SESSION_ID = 1;
+const requireLogin = require('../helpers/requireLogin.js')
 
 
 /*  
@@ -24,47 +20,47 @@ const SESSION_ID = 1;
 */
 
 // ROUTE: RENDER SELL TEMPLATE
-router.get('/sell', async (req, res) => {
+router.get('/sell', requireLogin, async (req, res) => {
+
     let user_data = await prisma.portfolios.findMany({
         where: {
-            user_id: SESSION_ID
+            user_id: req.session.user_id
         },
         include: {
             stocks: true
         }
     })
+
     user_data = user_data.map(s => s.stocks.symbol)
-    // console.log(user_data)
+
     res.render('finance/sell', {
-        user_data
+        user_data,
+        user: req.session.user_id,
+        username: req.session.username
     });
 }) // ✔️
 
 
 // ROUTE: HANDLE POST REQUEST FROM SELL FORM
 //      Perform the "Sell" by updating the database
-router.post('/sell', async (req, res) => {
+router.post('/sell', requireLogin, async (req, res) => {
 
     const { symbol, shares } = req.body;
-    // console.log(symbol, shares);
 
     // Check if the user owns shares
-    const [ user_owns ] = await prisma.$queryRaw`SELECT * FROM portfolios WHERE user_id=${SESSION_ID} AND stock_id IN (SELECT id FROM stocks WHERE symbol=${symbol})`
+    const [ user_owns ] = await prisma.$queryRaw`SELECT * FROM portfolios WHERE user_id=${req.session.user_id} AND stock_id IN (SELECT id FROM stocks WHERE symbol=${symbol})`
 
+    // TODO: Render apology (better: redirect to apology, best: flash apology)
     if (!user_owns) {
         res.send("NOPE!");
         return;
     }
-
+    
     let owned_shares = user_owns.shares;
     let owned_stock_id = user_owns.id;
-
-    // console.log(shares)
-    // console.log(owned_shares)
-    // console.log(owned_stock_id)
-
-
+    
     // Check if user owns enough shares
+    // TODO: Render apology (better: redirect to apology, best: flash apology)
     if (owned_shares < parseInt(shares)) {
         res.send("NOT ENOUGH SHARES!");
         return;
@@ -95,20 +91,15 @@ router.post('/sell', async (req, res) => {
     const { price } = await lookup(symbol);
     const { cash } = await prisma.users.findUnique({
         where: {
-            id: SESSION_ID
+            id: req.session.user_id
         }
     })
 
-    console.log("price: ", price, typeof(price));
-    console.log("cash: ", cash, typeof(cash));
-    console.log("shares: ", shares, typeof(shares));
-
     const updated_cash = parseFloat(cash) + (parseFloat(price) * parseFloat(shares));
-    console.log("updated cash: ", updated_cash);
 
     const updated_user_info = await prisma.users.update({
         where: {
-            id: SESSION_ID
+            id: req.session.user_id
         },
         data: {
             cash: updated_cash

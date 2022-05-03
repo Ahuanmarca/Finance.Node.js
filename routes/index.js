@@ -1,28 +1,13 @@
 const { Router } = require('express');
+const session = require('express-session');
 const router = Router();
 
 const prisma = require('../helpers/client.js');
 
 // Helper functions
-//      TODO: JOIN IN A SINGLE FILE LATER
 const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
-
-// MOCK USER DATA
-let SESSION_ID = 1;
-let SESSION_LOGGED = true;
-
-
-// router.use((req, res, next) => {
-//     if (SESSION_LOGGED) {
-//         next();
-//     } else {
-//         res.redirect('/finance/login'); // ! THIS CAUSES "TOO MANY REDIRECTS" ERROR ☹️
-//         return;
-//     }
-// });
-
-
+const requireLogin = require('../helpers/requireLogin.js');
 
 
 /*
@@ -35,15 +20,8 @@ let SESSION_LOGGED = true;
 */
 
 
-router.get('/', (req, res) => {
-    if (!SESSION_LOGGED) res.redirect('/finance/login');
-    res.redirect('/finance/index');
-}); // ✔️
-
-router.get('/index', async (req, res) => {
-    
-    // TODO: Hacer esto con middleware
-    if (!SESSION_LOGGED) res.redirect('/finance/login');
+router.get('/', requireLogin, (req, res) => res.redirect('/finance/index')); // ✔️
+router.get('/index', requireLogin, async (req, res) => {
 
     // SHOW PORTFOLIO STOCKS
     // 1) Sacar de la base de datos SYMBOLS y SHARES del usuario
@@ -55,7 +33,7 @@ router.get('/index', async (req, res) => {
             cash: true
         },
         where: {
-            id: SESSION_ID
+            id: req.session.user_id
         }
     })
 
@@ -64,7 +42,7 @@ router.get('/index', async (req, res) => {
     // Query DB for user portfolio and stocks
     const portfolio_data = await prisma.portfolios.findMany({
         where: {
-            user_id: SESSION_ID
+            user_id: req.session.user_id
         },
         include: {
             stocks: true
@@ -96,7 +74,7 @@ router.get('/index', async (req, res) => {
         // Calcular outflow_balance de cada row
         const transacciones = await prisma.transacciones.findMany({
             where: {
-                user_id: SESSION_ID,
+                user_id: req.session.user_id,
                 stock_id: portfolio_row.stocks.id
             }
         });
@@ -120,20 +98,10 @@ router.get('/index', async (req, res) => {
     res.render('finance/index', { 
         user_portfolio,
         cash: usd(parseFloat(cash)),
-        grand_total: usd(grand_total)
+        grand_total: usd(grand_total),
+        user: req.session.user_id,
+        username: req.session.username
     });
 }); // ✔️:⭐⭐⭐⭐
-
-
-
-
-
-
-
-
-router.get('/logout', (req, res) => {
-    console.log("Route: Logout - GET");
-    res.redirect('/');
-});
 
 module.exports = router;

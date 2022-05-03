@@ -5,9 +5,7 @@ const prisma = require('../helpers/client.js');
 // Helper functions
 const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
-
-const SESSION_ID = 1;
-
+const requireLogin = require('../helpers/requireLogin.js');
 
 /*
      ██████╗     ██╗   ██╗     ██████╗     ████████╗    ███████╗
@@ -19,15 +17,19 @@ const SESSION_ID = 1;
 */
 
 
-router.get('/quote', async (req, res) => {
+router.get('/quote', requireLogin, async (req, res) => {
 
     let query = req.query.symbol;
 
     if (!query) {
+        
         // Si NO existe query, render formulario
         res.render('finance/quote', {
-            symbol: false
+            symbol: false,
+            user: req.session.user_id,
+            username: req.session.username
         });
+
     } else {
         // Si existe query, valida y responde con info o apology
         let symbol = query.toUpperCase();
@@ -37,12 +39,16 @@ router.get('/quote', async (req, res) => {
         if (business_data) {
             res.render('finance/quote', {
                 symbol: business_data,
-                usd
+                usd,
+                user: req.session.user_id,
+                username: req.session.username
             });
         } else {
             res.render('finance/apology', {
                 top: 400,
-                bottom: "Invalid Symbol"
+                bottom: "Invalid Symbol",
+                user: req.session.user_id,
+                username: req.session.username
             });
             return;
         }
