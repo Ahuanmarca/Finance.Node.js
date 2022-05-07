@@ -12,6 +12,7 @@ router.use(cookieParser());
 const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
 const requireLogin = require('../helpers/requireLogin.js');
+// const req = require('express/lib/request');
 
 
 /*
@@ -28,7 +29,10 @@ router.get('/buy', requireLogin, csrfProtection, (req, res) => {
     res.render('finance/buy', {
         user: req.session.user_id,
         username: req.session.username,
-        csrfToken: req.csrfToken()
+        csrfToken: req.csrfToken(),
+        success: req.flash("success"),
+        failure: req.flash("failure"),
+        fullName: `${req.session.firstName} ${req.session.lastName}` 
     })
 }); // ✔️
 
@@ -39,41 +43,59 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
     // Tomar input de usuario
     const { symbol, shares } = req.body;
 
-    // TODO: Handle invalid characters
-    // ...
+    // Handle missing input // ERROR CHECKING
+    if (!symbol || !shares) {
+        req.flash('failure', 'Missing input!');
+        res.redirect('/finance/buy');
+        return;
+    }
 
-    // TODO: Handle fractional and negative values
-    // ...
+    // Check if shares input is numeric
+    //      parseFloat shares, then check for NaN
+    if (Number.isNaN(parseFloat(shares))) {
+        req.flash('failure', 'Must be numeric!');
+        res.redirect('/finance/buy');
+        return;
+    }    
+
+    // Handle fractional and negative values
+    if (parseFloat(shares) % 1 != 0) {
+        req.flash('failure', "No fraction!");
+        res.redirect('/finance/buy');
+        return;
+    }
+    if (parseFloat(shares) < 0) {
+        req.flash('failure', 'No negative!');
+        res.redirect('/finance/buy');
+        return;
+    }
+
 
     // Lookup symbol and check if it's valid
-    const business_info = await lookup(symbol);
+    const stockInfo = await lookup(symbol);
     
-    if (!business_info) {
-        res.render('finance/apology', {
-            top: 400,
-            bottom: "Invalid Symbol"
-        });
+    if (!stockInfo) {
+        req.flash('failure', 'Invalid symbol!');
+        res.redirect('/finance/buy');
         return;
     }
     
-    const name = business_info.name;
-    const price = parseFloat(business_info.price);
+    const name = stockInfo.name;
+    const price = parseFloat(stockInfo.price);
 
-    const user_info = await prisma.users.findUnique({
+    const userInfo = await prisma.users.findUnique({
         where: {
             id: req.session.user_id
         }
     })
     
-    let cash = parseFloat(user_info.cash);
+    let cash = parseFloat(userInfo.cash);
     const spending = price * parseFloat(shares);
 
     // Check if there's enough cash to complete the purchase
     if (spending > cash) {
-        res.render('finance/apology', {
-            top: 400,
-            bottom: "Not enough cash"
-        })
+        req.flash('failure', 'Not enough cash!');
+        res.redirect('/finance/buy');
         return;
     }
 
@@ -81,31 +103,31 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
     // INSERT into stocks, INSERT or UPDATE portfolios, INSERT into transacciones
 
     // Search symbol in stocks
-    const stored_stock = await prisma.stocks.findFirst({
+    const storedStock = await prisma.stocks.findFirst({
         where: {
             symbol: symbol.toUpperCase()
         }
     })
 
     // If the symbol is not present, INSERT symbol and name into stocks, INSERT shares into portfolios, INSERT transaccion into transacciones
-    if (!stored_stock) {
-        const new_stock = await prisma.stocks.create({
+    if (!storedStock) {
+        const newStock = await prisma.stocks.create({
             data: {
                 symbol: symbol.toUpperCase(),
                 name: name
             }
         });
-        const new_shares = await prisma.portfolios.create({
+        const newShares = await prisma.portfolios.create({
             data: {
                 user_id: req.session.user_id,
-                stock_id: new_stock.id,
+                stock_id: newStock.id,
                 shares: parseInt(shares)
             }
         });
-        const new_transaction = await prisma.transacciones.create({
+        const newTransaction = await prisma.transacciones.create({
             data: {
                 user_id: req.session.user_id,
-                stock_id: new_stock.id,
+                stock_id: newStock.id,
                 shares: parseInt(shares),
                 price: price
             }
@@ -114,44 +136,44 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
         // If the symbol is present and...
         // ... the user owns no shares: INSERT
         // ... the user owns at least one share: UPDATE
-        const owned_stock= await prisma.portfolios.findFirst({
+        const ownedStock= await prisma.portfolios.findFirst({
             where: {
                 user_id: req.session.user_id,
-                stock_id: stored_stock.id
+                stock_id: storedStock.id
             }
         })
 
-        if (!owned_stock) {
+        if (!ownedStock) {
             const buy_shares = await prisma.portfolios.create({
                 data: {
                     user_id: req.session.user_id,
-                    stock_id: stored_stock.id,
+                    stock_id: storedStock.id,
                     shares: parseInt(shares)
                 }
             });
-            const new_transaction = await prisma.transacciones.create({
+            const newTransaction = await prisma.transacciones.create({
                 data: {
                     user_id: req.session.user_id,
-                    stock_id: stored_stock.id,
+                    stock_id: storedStock.id,
                     shares: parseInt(shares),
                     price: price
                 }
             });
         } else {
-            const shares_new_total = parseInt(owned_stock.shares) + parseInt(shares);
-            const new_shares = await prisma.portfolios.updateMany({
+            const sharesNewTotal = parseInt(ownedStock.shares) + parseInt(shares);
+            const newShares = await prisma.portfolios.updateMany({
                 where: {
                     user_id: req.session.user_id,
-                    stock_id: owned_stock.stock_id
+                    stock_id: ownedStock.stock_id
                 },
                 data: {
-                    shares: shares_new_total
+                    shares: sharesNewTotal
                 }
             });
-            const new_transaction = await prisma.transacciones.create({
+            const newTransaction = await prisma.transacciones.create({
                 data: {
                     user_id: req.session.user_id,
-                    stock_id: stored_stock.id,
+                    stock_id: storedStock.id,
                     shares: parseInt(shares),
                     price: price
                 }
@@ -161,7 +183,7 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
 
     // Update user's cash
     cash = cash - spending;
-    const new_cash_total = await prisma.users.update({
+    const newCashTotal = await prisma.users.update({
         where: {
             id: req.session.user_id
         },
@@ -170,12 +192,13 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
         }
     });
 
-    // Redirect to index (FALTA FLASH MESSAGE""")
-    // console.log("Buy succesfull!")
+    // Generate flashed message
+    const message = `Bought ${shares} shares of ${symbol.toUpperCase()} at ${usd(price)} each, for a total of ${usd(parseFloat(price) * parseFloat(shares))}.`;
+    req.flash('success', message);
+    
+    // Redirect to index
     res.redirect('/finance/index');
-}); // ✔️:⭐⭐
-// TODO: Handle invalid characters in "symbol" field
-// TODO: Handle franctional or negative values in "shares" field
-// TODO: Flash message when operation is complete
+
+}); // ✔️:⭐⭐⭐
 
 module.exports = router;

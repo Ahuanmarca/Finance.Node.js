@@ -27,7 +27,11 @@ router.get('/quote', requireLogin, async (req, res) => {
         res.render('finance/quote', {
             symbol: false,
             user: req.session.user_id,
-            username: req.session.username
+            username: req.session.username,
+            success: req.flash("success"),
+            failure: req.flash("failure"),
+            // message: req.flash("message"),
+            fullName: `${req.session.firstName} ${req.session.lastName}` 
         });
 
     } else {
@@ -41,15 +45,16 @@ router.get('/quote', requireLogin, async (req, res) => {
                 symbol: business_data,
                 usd,
                 user: req.session.user_id,
-                username: req.session.username
+                username: req.session.username,
+                success: req.flash("success"),
+                failure: req.flash("failure"),
+                // message: req.flash("message"),
+                fullName: `${req.session.firstName} ${req.session.lastName}` 
+
             });
         } else {
-            res.render('finance/apology', {
-                top: 400,
-                bottom: "Invalid Symbol",
-                user: req.session.user_id,
-                username: req.session.username
-            });
+            req.flash('failure', 'Invalid Symbol');
+            res.redirect('/finance/flash');
             return;
         }
     }

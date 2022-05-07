@@ -9,6 +9,7 @@ router.use(cookieParser());
 
 // Helper functions
 const authenticate = require('../helpers/authenticate.js');
+const flash = require('connect-flash/lib/flash');
 
 /*
     ██╗          ██████╗      ██████╗     ██╗    ███╗   ██╗
@@ -26,10 +27,14 @@ router.get('/login', csrfProtection, (req, res) => {
         res.redirect('/finance/index');
     }
 
+
     res.render('finance/login', {
         user: req.session.user_id,
         username: req.session.username,
-        csrfToken: req.csrfToken()
+        csrfToken: req.csrfToken(),
+        success: req.flash("success"),
+        failure: req.flash("failure"),
+        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 }); // ✔️
 
@@ -45,11 +50,15 @@ router.post('/login', csrfProtection, async (req, res) => {
     const auth = await authenticate(req.body);
 
     if (auth.validation) {
+        req.flash('success', `Welcome back ${auth.firstName}!`)
         req.session.user_id = auth.id;
         req.session.username = auth.username;
+        req.session.firstName = auth.firstName;
+        req.session.lastName = auth.lastName;
         res.redirect('/finance/index');
     } else {
-        res.send("Invalid username or password!");
+        req.flash('failure', 'Invalid username or password!');
+        res.redirect('/finance/changePassword');
         return;
     }
 })

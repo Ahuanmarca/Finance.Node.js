@@ -46,6 +46,9 @@ model users {
   username      String          @unique(map: "username") @db.VarChar(12)
   hash          String          @db.VarChar(255)
   cash          Decimal         @default(10000.0000) @db.Decimal(19, 4)
+  first_name    String          @db.VarChar(255)
+  last_name     String          @db.VarChar(255)
+  email         String          @db.VarChar(320)
   portfolios    portfolios[]
   transacciones transacciones[]
 }

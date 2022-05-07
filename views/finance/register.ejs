@@ -1,16 +1,32 @@
 <% layout('layouts/layout') %>
-<!-- <h1>REGISTER</h1> -->
 
 <form action="/finance/register" method="post">
     <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
     <div class="mb-3">
         <input autocomplete="off" autofocus class="form-control mx-auto w-auto" id="username" name="username" placeholder="Username" type="text">
     </div>
+    
     <div class="mb-3">
         <input class="form-control mx-auto w-auto" id="password" name="password" placeholder="Password" type="password">
     </div>
+    
     <div class="mb-3">
         <input class="form-control mx-auto w-auto" id="password" name="confirmation" placeholder="Password (Again)" type="password">
     </div>
+    
+    <div class="mb-3">
+        <input autocomplete="off" class="form-control mx-auto w-auto" id="firstName" name="firstName" placeholder="First Name" type="text">
+    </div>
+
+    <div class="mb-3">
+        <input autocomplete="off" class="form-control mx-auto w-auto" id="lastName" name="lastName" placeholder="Last Name" type="text">
+    </div>
+
+    <div class="mb-3">
+        <input autocomplete="off" class="form-control mx-auto w-auto" id="email" name="email" placeholder="E-mail" type="text">
+    </div>
+    
+
     <button class="btn btn-primary" type="submit">Register</button>
 </form>

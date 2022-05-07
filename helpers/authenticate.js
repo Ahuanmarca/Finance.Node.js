@@ -27,6 +27,8 @@ const authenticate = async (pack) => {
     return {
         id: user.id,
         username: user.username,
+        firstName: user.first_name,
+        lastName: user.last_name,
         validation: validation
     }
 }

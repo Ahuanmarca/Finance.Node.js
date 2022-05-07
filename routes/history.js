@@ -34,7 +34,11 @@ router.get('/history', requireLogin, async (req, res) => {
         user: req.session.user_id,
         username: req.session.username,
         usd,
-        parseDateTime
+        parseDateTime,
+        success: req.flash("success"),
+        failure: req.flash("failure"),
+        // message: req.flash("message"),
+        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 }); // ✔️:⭐⭐
 

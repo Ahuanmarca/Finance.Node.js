@@ -1,9 +1,15 @@
 <nav class="bg-light border navbar navbar-expand-md navbar-light">
     <div class="container-fluid">
+
+        <!-- Main title: CS50 Finance -->
         <a class="navbar-brand" href="/finance/index"><span class="blue">C</span><span class="red">$</span><span class="yellow">5</span><span class="green">0</span> <span class="red">Finance</span></a>
+
+        <!-- Drawer? -->
         <button aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation" class="navbar-toggler" data-bs-target="#navbar" data-bs-toggle="collapse" type="button">
             <span class="navbar-toggler-icon"></span>
         </button>
+
+        <!-- Navigation -->
         <div class="collapse navbar-collapse" id="navbar">
             <% if (user) { %> 
                 <ul class="navbar-nav me-auto mt-2">
@@ -13,6 +19,7 @@
                     <li class="nav-item"><a class="nav-link" href="/finance/history">History</a></li>
                 </ul>
                 <ul class="navbar-nav ms-auto mt-2">
+                    <li class="nav-item"><span class="nav-link"><%= `${fullName}'s Portfolio` %></span></li>
                     <li class="nav-item"><a class="nav-link" href="/finance/changePassword">Change Password</a></li>
                     <li class="nav-item"><a class="nav-link" href="/finance/logout">Log Out</a></li>
                 </ul>

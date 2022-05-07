@@ -32,7 +32,11 @@ router.get('/changePassword', requireLogin, csrfProtection, (req, res) => {
     res.render('finance/changePassword', {
         user: req.session.user_id,
         username: req.session.username,
-        csrfToken: req.csrfToken()
+        csrfToken: req.csrfToken(),
+        success: req.flash("success"),
+        failure: req.flash("failure"),
+        // message: req.flash("message"),
+        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 })
 
@@ -44,13 +48,15 @@ router.put('/changePassword', requireLogin, csrfProtection, async (req, res) => 
     const auth = await authenticate({username: req.session.username, password: oldPassword});
 
     if (!auth.validation) {
-        res.send("Invalid Password");
+        req.flash('failure', 'Invalid Password');
+        res.redirect('/finance/changePassword');
         return;
     }
 
     // Check if new password and confirmation match
     if (newPassword != newPasswordConfirmation) {
-        res.send("New password and confirmation must match");
+        req.flash('failure', 'New password and confirmation must match!');
+        res.redirect('/finance/changePassword');
         return;
     }
 
@@ -66,6 +72,8 @@ router.put('/changePassword', requireLogin, csrfProtection, async (req, res) => 
             id: req.session.user_id
         }
     });
+
+    req.flash('success', 'Changed Password');
 
     res.redirect('/finance/index');
 })
