@@ -32,7 +32,7 @@ router.get('/sell', requireLogin, csrfProtection, async (req, res) => {
     // *     ...no need to mention 'portfolios'... That's nice!
     let userData = await prisma.portfolios.findMany({
         where: {
-            user_id: req.session.user_id
+            user_id: req.session.userID
         },
         include: {
             stocks: true
@@ -44,8 +44,9 @@ router.get('/sell', requireLogin, csrfProtection, async (req, res) => {
 
     // Send the owned symbols to the "sell" form
     res.render('finance/sell', {
+        title: "Sell",
         symbols,
-        user: req.session.user_id,
+        user: req.session.userID,
         username: req.session.username,
         csrfToken: req.csrfToken(),
         success: req.flash("success"),
@@ -98,7 +99,7 @@ router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
         return;
     }
 
-    // IF the symbol is already stored in 'stocks' table, retrieve it's id (as stock_id)
+    // IF the symbol is already stored in 'stocks' table, retrieve it's id (as stockID)
     // ELSE IF the symbol is not present, create it's entry and remember it's id
     const storedStock = await prisma.stocks.findFirst({
         where: {
@@ -106,9 +107,9 @@ router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
         }
     });
 
-    let stock_id = undefined;
+    let stockID = undefined;
     if (storedStock) {
-        stock_id = storedStock.id;
+        stockID = storedStock.id;
     } else {
         const newStoredStock = await prisma.stocks.create({
             data: {
@@ -116,21 +117,15 @@ router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
                 name: stockInfo.name
             }
         });
-        stock_id = newStoredStock.id;
+        stockID = newStoredStock.id;
     }
-
-    // const { id: stock_id } = await prisma.stocks.findFirst({
-    //     where: {
-    //         symbol: symbol
-    //     }
-    // });
 
     // Check if the user owns the stocks that it's trying to sell - ERROR CHECKING
     //      while on it - remember the user's owned stock (as userOwns)
     const userOwns = await prisma.portfolios.findFirst({
         where: {
-            user_id: req.session.user_id,
-            stock_id: stock_id
+            user_id: req.session.userID,
+            stock_id: stockID
         }
     });
     if (!userOwns) {
@@ -143,7 +138,7 @@ router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
     let ownedShares = userOwns.shares;
 
     // 👀 Unique ID from portfolio's row
-    let portfolioRow__ID = userOwns.id; 
+    let portfolioRowID = userOwns.id; 
 
     // Check if the user owns enough shares - ERROR CHECKING
     if (ownedShares < parseInt(shares)) {
@@ -156,14 +151,14 @@ router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
     if (ownedShares === parseInt(shares)) {
         const updatedPortolio = await prisma.portfolios.delete({
             where: {
-                id: portfolioRow__ID
+                id: portfolioRowID
             }
         });
     // Else (the user still onws some shares), UPDATE the amount of shares owned
     } else {
         const updatedPortolio = await prisma.portfolios.update({
             where: {
-                id: portfolioRow__ID
+                id: portfolioRowID
             },
             data: {
                 // Update shares owned by substracting the sold shares
@@ -179,9 +174,9 @@ router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
     const income = parseFloat(price) * parseFloat(shares);
 
     // Update user´s cash by adding the income from the sell
-    const updated_cash = await prisma.users.update({
+    const updatedCash = await prisma.users.update({
         where: {
-            id: req.session.user_id
+            id: req.session.userID
         },
         data: {
             cash: {
@@ -189,25 +184,19 @@ router.post('/sell', requireLogin, csrfProtection, async (req, res) => {
             }
         }
     }); // ✔️
-
-    // Output to console: new transaction added to history ("transacciones" table)
-    console.log('new transaction added to history: ', {
-        user_id: req.session.user_id, 
-        symbol, // This wont be created on the table
-        stock_id, 
-        shares: parseFloat(shares) * -1, 
-        price
-    });
-
+    
     // Create new transaction on history ("transacciones" table)
-    const new_transaction = await prisma.transacciones.create({
+    const newTransaction = await prisma.transacciones.create({
         data: {
-            user_id: req.session.user_id,
-            stock_id: stock_id,
+            user_id: req.session.userID,
+            stock_id: stockID,
             shares: parseFloat(shares) * -1,
             price: price
         }
     })
+    
+    // Output new transaction to console
+    console.log(newTransaction)
 
     const message = `Sold ${shares} shares of ${stockInfo.name} (${symbol}) at ${usd(price)} each, for a total of ${usd(parseFloat(price) * parseFloat(shares))}.`
 

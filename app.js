@@ -22,16 +22,6 @@ app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(flash());
-
-/*
-███████╗███████╗███████╗███████╗██╗ ██████╗ ███╗   ██╗
-██╔════╝██╔════╝██╔════╝██╔════╝██║██╔═══██╗████╗  ██║
-███████╗█████╗  ███████╗███████╗██║██║   ██║██╔██╗ ██║
-╚════██║██╔══╝  ╚════██║╚════██║██║██║   ██║██║╚██╗██║
-███████║███████╗███████║███████║██║╚██████╔╝██║ ╚████║
-╚══════╝╚══════╝╚══════╝╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝
-Esto crea la sesión, ahora la sesión "existe" y se pueden
-guardar variables... similar a variables de entorno. */
 app.use(session({secret: '4kit4rig4to', resave: false, saveUninitialized: false}));
 
 /*

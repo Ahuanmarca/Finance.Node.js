@@ -61,12 +61,15 @@
 - Replaced apology pages with flash messages, staying in the same page instead
 - Implemented 2 kind of flash messages: success (blue) and failure (yellow). Took me a while to figure out how to make them different!
 - Clean up the variable naming convention. After some research I gatter that it's best to use camel case in JavaScript, although it's acceptable to use snake case (which I prefer because is more readable). I'm sticking with camel case for now.
-- **BIG ONE**: REDUCE REDUNDANCY IN CONTEXT THAT IS PASSED TO THE RENDERED TEMPLATES.
-    - When logging in, all the variables that are stored in the session will be grouped inside an object called "context", so it´s only required to "spread" this object into the render context.
 
+### CHANGES 07-05-2022
+- Passing different title to all views
+- Favicon
+- Using bootstrap from downloaded files instead of link
+- 
 
 ### TODO
-- ERROR CHECKING! - A ton is needed, there are multiple ways the user can send invalid data, thus causing the server to crash (at best?).
+- More and better error checking
 - SEED DB - Need to create a file to seed the DB with 3 users, each with at least 8 stocks, and a history that spans at least a few weeks... So I can try some interesting features with the history later
 - Clean up structure of the files inside /Finance-Node folder... put stuff in /src folder ??
 - Clean up res.render() context, theres a lot of redundancy of the same stuff always being sent. Maybe create an object?

@@ -14,17 +14,17 @@
     </thead>
 
     <tbody>
-        <% for (row in user_portfolio) { %> 
+        <% for (row in userPortfolio) { %> 
         <tr>
-            <td class="text-start"> <%= user_portfolio[row].symbol %> </td>
-            <td class="text-start"> <%= user_portfolio[row].name %> </td>
-            <td class="text-end"> <%= user_portfolio[row].shares %> </td>
-            <% if (user_portfolio[row].performance) {%> 
-            <td class="text-end" id="row_price" style="color:blue"><%= user_portfolio[row].price %> </td>
+            <td class="text-start"> <%= userPortfolio[row].symbol %> </td>
+            <td class="text-start"> <%= userPortfolio[row].name %> </td>
+            <td class="text-end"> <%= userPortfolio[row].shares %> </td>
+            <% if (userPortfolio[row].performance) {%> 
+            <td class="text-end" id="row_price" style="color:blue"><%= userPortfolio[row].price %> </td>
             <%} else {%> 
-            <td class="text-end" id="row_price" style="color:red"><%= user_portfolio[row].price %> </td>
+            <td class="text-end" id="row_price" style="color:red"><%= userPortfolio[row].price %> </td>
             <% } %> 
-            <td class="text-end" id="row_total"> <%= user_portfolio[row].total %> </td>
+            <td class="text-end" id="row_total"> <%= userPortfolio[row].total %> </td>
         </tr>
         <% } %> 
     </tbody>
@@ -36,7 +36,7 @@
         </tr>
         <tr>
             <td class="border-0 fw-bold text-end"  colspan="4">TOTAL</td>
-            <td class="border-0 w-bold text-end"><%= grand_total %></td>
+            <td class="border-0 w-bold text-end"><%= grandTotal %></td>
         </tr>
     </tfoot>
 </table>

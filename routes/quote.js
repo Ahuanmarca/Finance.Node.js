@@ -25,30 +25,30 @@ router.get('/quote', requireLogin, async (req, res) => {
         
         // Si NO existe query, render formulario
         res.render('finance/quote', {
+            title: "Quote",
             symbol: false,
-            user: req.session.user_id,
+            user: req.session.userID,
             username: req.session.username,
             success: req.flash("success"),
             failure: req.flash("failure"),
-            // message: req.flash("message"),
             fullName: `${req.session.firstName} ${req.session.lastName}` 
         });
 
     } else {
         // Si existe query, valida y responde con info o apology
         let symbol = query.toUpperCase();
-        const business_data = await lookup(symbol);
-        console.log(business_data)
+        const stockInfo = await lookup(symbol);
+        // console.log(stockInfo)
 
-        if (business_data) {
+        if (stockInfo) {
             res.render('finance/quote', {
-                symbol: business_data,
+                title: "Quote",
+                symbol: stockInfo,
                 usd,
-                user: req.session.user_id,
+                user: req.session.userID,
                 username: req.session.username,
                 success: req.flash("success"),
                 failure: req.flash("failure"),
-                // message: req.flash("message"),
                 fullName: `${req.session.firstName} ${req.session.lastName}` 
 
             });

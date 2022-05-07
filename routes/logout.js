@@ -4,7 +4,7 @@ const router = Router();
 router.get('/logout', async (req, res) => {
 
     // TODO: Creo que es mejor "destruir" la sesión, puesto que estoy almacenando varios datos ahí.
-    req.session.user_id = null;
+    req.session.userID = null;
 
     req.flash('success', 'Bye!')
 

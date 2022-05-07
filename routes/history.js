@@ -20,9 +20,9 @@ const parseDateTime = require('../helpers/parseDateTime');
 router.get('/history', requireLogin, async (req, res) => {
 
     // Get history from current user
-    const user_history = await prisma.transacciones.findMany({
+    const userHistory = await prisma.transacciones.findMany({
         where: {
-            user_id: req.session.user_id
+            user_id: req.session.userID
         },
         include: {
             stocks: true
@@ -30,19 +30,19 @@ router.get('/history', requireLogin, async (req, res) => {
     });
 
     res.render('finance/history', {
-        user_history,
-        user: req.session.user_id,
+        title: "History",
+        userHistory,
+        user: req.session.userID,
         username: req.session.username,
         usd,
         parseDateTime,
         success: req.flash("success"),
         failure: req.flash("failure"),
-        // message: req.flash("message"),
         fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 }); // ✔️:⭐⭐
 
 // TODO: Find a better way to format the time string (currently done inside the template) - ✔️ Done!
-// Created a helper function that parses the date from the DB format to a nice string, then passed the function to the EJS template. Commented out the noise to the bottom, just as a nice reminder.
+//      Created a helper function that parses the date from the DB format to a nice string, then passed the function to the EJS template. Commented out the noise to the bottom, just as a nice reminder.
 
 module.exports = router;

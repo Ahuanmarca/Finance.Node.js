@@ -20,18 +20,29 @@ router.use(cookieParser());
 
 
 router.get('/register', csrfProtection, (req, res) => {
+
+    // If user is aready logged, redirect to index
+    if (req.session.userID) {
+        res.redirect('/finance/index');
+    }
+
     res.render('finance/register', {
-        user: req.session.user_id,
-        username: req. session.username,
+        title: "Register",
+        user: req.session.userID,
+        username: req.session.username,
         csrfToken: req.csrfToken(),
         success: req.flash("success"),
         failure: req.flash("failure"),
-        // message: req.flash("message"),
         fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 });
 
 router.post('/register', csrfProtection, async (req, res) => {
+
+    // If user is aready logged, redirect to index
+    if (req.session.userID) {
+        res.redirect('/finance/index');
+    }
 
     const { username, password, confirmation, firstName, lastName, email } = req.body;
 
@@ -64,8 +75,8 @@ router.post('/register', csrfProtection, async (req, res) => {
     // Hash password
     const hash = await bcrypt.hash(password, 12);
 
-    // Save usar in DB
-    const new_user = await prisma.users.create({
+    // Save new user in DB
+    const newUser = await prisma.users.create({
         data: {
             username: username,
             hash: hash,
@@ -76,10 +87,10 @@ router.post('/register', csrfProtection, async (req, res) => {
     });
 
     // Login with newly registered user
-    req.session.user_id = new_user.id;
-    req.session.username = new_user.username; 
-    req.session.firstName = new_user.first_name;
-    req.session.lastName = new_user.last_name;
+    req.session.userID = newUser.id;
+    req.session.username = newUser.username; 
+    req.session.firstName = newUser.first_name;
+    req.session.lastName = newUser.last_name;
 
     req.flash('success', 'Registered!');
 

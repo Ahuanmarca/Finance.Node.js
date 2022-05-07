@@ -1,5 +1,4 @@
 <% layout('layouts/layout') %>
-<!-- <h1>HISTORY</h1> -->
 
 <table class="table tablestriped">
     <thead>
@@ -12,7 +11,7 @@
     </thead>
 
     <tbody>
-        <% for (row of user_history) {%> 
+        <% for (row of userHistory) {%> 
         <tr>
             <td class="text-start"> <%= row.stocks.symbol %> </td>
             <td class="text-end"> <%= row.shares %> </td>

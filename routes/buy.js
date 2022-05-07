@@ -12,7 +12,6 @@ router.use(cookieParser());
 const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
 const requireLogin = require('../helpers/requireLogin.js');
-// const req = require('express/lib/request');
 
 
 /*
@@ -27,7 +26,8 @@ const requireLogin = require('../helpers/requireLogin.js');
 
 router.get('/buy', requireLogin, csrfProtection, (req, res) => {
     res.render('finance/buy', {
-        user: req.session.user_id,
+        title: "Buy",
+        user: req.session.userID,
         username: req.session.username,
         csrfToken: req.csrfToken(),
         success: req.flash("success"),
@@ -85,7 +85,7 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
 
     const userInfo = await prisma.users.findUnique({
         where: {
-            id: req.session.user_id
+            id: req.session.userID
         }
     })
     
@@ -119,14 +119,14 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
         });
         const newShares = await prisma.portfolios.create({
             data: {
-                user_id: req.session.user_id,
+                user_id: req.session.userID,
                 stock_id: newStock.id,
                 shares: parseInt(shares)
             }
         });
         const newTransaction = await prisma.transacciones.create({
             data: {
-                user_id: req.session.user_id,
+                user_id: req.session.userID,
                 stock_id: newStock.id,
                 shares: parseInt(shares),
                 price: price
@@ -138,7 +138,7 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
         // ... the user owns at least one share: UPDATE
         const ownedStock= await prisma.portfolios.findFirst({
             where: {
-                user_id: req.session.user_id,
+                user_id: req.session.userID,
                 stock_id: storedStock.id
             }
         })
@@ -146,14 +146,14 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
         if (!ownedStock) {
             const buy_shares = await prisma.portfolios.create({
                 data: {
-                    user_id: req.session.user_id,
+                    user_id: req.session.userID,
                     stock_id: storedStock.id,
                     shares: parseInt(shares)
                 }
             });
             const newTransaction = await prisma.transacciones.create({
                 data: {
-                    user_id: req.session.user_id,
+                    user_id: req.session.userID,
                     stock_id: storedStock.id,
                     shares: parseInt(shares),
                     price: price
@@ -163,7 +163,7 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
             const sharesNewTotal = parseInt(ownedStock.shares) + parseInt(shares);
             const newShares = await prisma.portfolios.updateMany({
                 where: {
-                    user_id: req.session.user_id,
+                    user_id: req.session.userID,
                     stock_id: ownedStock.stock_id
                 },
                 data: {
@@ -172,7 +172,7 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
             });
             const newTransaction = await prisma.transacciones.create({
                 data: {
-                    user_id: req.session.user_id,
+                    user_id: req.session.userID,
                     stock_id: storedStock.id,
                     shares: parseInt(shares),
                     price: price
@@ -185,7 +185,7 @@ router.post('/buy', requireLogin, csrfProtection, async (req, res) => {
     cash = cash - spending;
     const newCashTotal = await prisma.users.update({
         where: {
-            id: req.session.user_id
+            id: req.session.userID
         },
         data: {
             cash: parseFloat(cash)

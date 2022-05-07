@@ -34,16 +34,16 @@ router.get('/index', requireLogin, async (req, res) => {
             cash: true
         },
         where: {
-            id: req.session.user_id
+            id: req.session.userID
         }
     })
 
-    let grand_total = 0 + parseInt(cash);
+    let grandTotal = 0 + parseInt(cash);
 
     // Query DB for user portfolio and stocks
-    const portfolio_data = await prisma.portfolios.findMany({
+    const portfolioData = await prisma.portfolios.findMany({
         where: {
-            user_id: req.session.user_id
+            user_id: req.session.userID
         },
         include: {
             stocks: true
@@ -54,12 +54,12 @@ router.get('/index', requireLogin, async (req, res) => {
     //      SYMBOL, SHARES (FROM DB)
     //      NAME, PRICE (FROM IEX)
     //      ROW'S TOTAL (CALCULATE)
-    const user_portfolio = [];
-    for (portfolio_row of portfolio_data) {
+    const userPortfolio = [];
+    for (portfolioRow of portfolioData) {
         
         // Get symbols and shares from database
-        const symbol = portfolio_row.stocks.symbol;
-        const shares = portfolio_row.shares;
+        const symbol = portfolioRow.stocks.symbol;
+        const shares = portfolioRow.shares;
 
         // Use symbols to lookup price and name
         const data = await lookup(symbol);
@@ -69,49 +69,42 @@ router.get('/index', requireLogin, async (req, res) => {
         // Use price and shares to get total
         const total = parseFloat(price) * parseFloat(shares);
         
-        // Update grand_total
-        grand_total += total;
+        // Update grandTotal
+        grandTotal += total;
 
-        // Calcular outflow_balance de cada row
+        // Calcular outflowBalance de cada row
         const transacciones = await prisma.transacciones.findMany({
             where: {
-                user_id: req.session.user_id,
-                stock_id: portfolio_row.stocks.id
+                user_id: req.session.userID,
+                stock_id: portfolioRow.stocks.id
             }
         });
-        let outflow_balance = 0;
+        let outflowBalance = 0;
         for (row of transacciones) {
-            outflow_balance += (parseFloat(row.price) * parseFloat(row.shares));
+            outflowBalance += (parseFloat(row.price) * parseFloat(row.shares));
         }
 
-        let performance = (total >= outflow_balance);
+        let performance = (total >= outflowBalance);
 
         // Push all data into the user portfolio to be sent into the render response
-        user_portfolio.push({
+        userPortfolio.push({
             symbol, 
             name, 
-            price: usd(price), 
+            price: usd(parseFloat(price)), 
             shares, 
-            total: usd(total), 
+            total: usd(parseFloat(total)), 
             performance});
     }
 
-    // TODO: I want to display a red error flashed message (instead of the blue one) when the message is some kind of error. Currently all messages are displayed on a blue container. The problem is that I can´t find a way to evaluate the "req.flash" generated object, appart from it's length (which at least allows me to check if there's a message present). On alternative is to use the 'flash' package instead of the 'connec-flash' package, as it seems to be more friendly for these purposes.
-    // let foo = req.flash("message")
-    // console.log(foo)
-    // let bar = Object.getOwnPropertyNames(foo)
-    // let bar = Object.keys(foo)
-    // console.log(bar)
-
-    res.render('finance/index', { 
-        user_portfolio,
+    res.render('finance/index', {
+        title: "Portfolio",
+        userPortfolio,
         cash: usd(parseFloat(cash)),
-        grand_total: usd(grand_total),
-        user: req.session.user_id,
+        grandTotal: usd(grandTotal),
+        user: req.session.userID,
         username: req.session.username,
         success: req.flash("success"),
         failure: req.flash("failure"),
-        // message: req.flash("message"),
         fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 }); // ✔️:⭐⭐⭐⭐

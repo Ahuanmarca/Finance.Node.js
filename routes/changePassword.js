@@ -30,12 +30,12 @@ const authenticate = require('../helpers/authenticate.js');
 
 router.get('/changePassword', requireLogin, csrfProtection, (req, res) => {
     res.render('finance/changePassword', {
-        user: req.session.user_id,
+        title: "Change Password",
+        user: req.session.userID,
         username: req.session.username,
         csrfToken: req.csrfToken(),
         success: req.flash("success"),
         failure: req.flash("failure"),
-        // message: req.flash("message"),
         fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 })
@@ -69,7 +69,7 @@ router.put('/changePassword', requireLogin, csrfProtection, async (req, res) => 
             hash: newHash
         },
         where: {
-            id: req.session.user_id
+            id: req.session.userID
         }
     });
 
