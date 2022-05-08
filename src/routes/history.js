@@ -3,7 +3,6 @@ const router = Router();
 const prisma = require('../helpers/client.js');
 
 // Helper functions
-// const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
 const requireLogin = require('../helpers/requireLogin.js');
 const parseDateTime = require('../helpers/parseDateTime');

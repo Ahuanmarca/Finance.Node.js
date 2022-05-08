@@ -47,6 +47,11 @@ router.get('/index', requireLogin, async (req, res) => {
         },
         include: {
             stocks: true
+        },
+        orderBy: {
+            stocks: {
+                symbol: 'asc'
+            }
         }
     });
 

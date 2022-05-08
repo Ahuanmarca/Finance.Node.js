@@ -11,36 +11,23 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.engine('ejs', ejsMate);
 
-/*
-███╗   ███╗██╗██████╗ ██████╗ ██╗     ███████╗██╗    ██╗ █████╗ ██████╗ ███████╗
-████╗ ████║██║██╔══██╗██╔══██╗██║     ██╔════╝██║    ██║██╔══██╗██╔══██╗██╔════╝
-██╔████╔██║██║██║  ██║██║  ██║██║     █████╗  ██║ █╗ ██║███████║██████╔╝█████╗  
-██║╚██╔╝██║██║██║  ██║██║  ██║██║     ██╔══╝  ██║███╗██║██╔══██║██╔══██╗██╔══╝  
-██║ ╚═╝ ██║██║██████╔╝██████╔╝███████╗███████╗╚███╔███╔╝██║  ██║██║  ██║███████╗
-╚═╝     ╚═╝╚═╝╚═════╝ ╚═════╝ ╚══════╝╚══════╝ ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝  ╚═╝╚══════╝ */
+// MIDDLEWARE
 app.use(express.urlencoded({ extended: true }));
 app.use(methodOverride('_method'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'src/public')));
 app.use(flash());
 app.use(session({secret: '4kit4rig4to', resave: false, saveUninitialized: false}));
 
-/*
-██████╗  ██████╗ ██╗   ██╗████████╗███████╗███████╗
-██╔══██╗██╔═══██╗██║   ██║╚══██╔══╝██╔════╝██╔════╝
-██████╔╝██║   ██║██║   ██║   ██║   █████╗  ███████╗
-██╔══██╗██║   ██║██║   ██║   ██║   ██╔══╝  ╚════██║
-██║  ██║╚██████╔╝╚██████╔╝   ██║   ███████╗███████║
-╚═╝  ╚═╝ ╚═════╝  ╚═════╝    ╚═╝   ╚══════╝╚══════╝ */
-app.use('/finance', require('./routes/index'));
-app.use('/finance', require('./routes/buy'));
-app.use('/finance', require('./routes/history'));
-app.use('/finance', require('./routes/login'));
-app.use('/finance', require('./routes/quote'));
-app.use('/finance', require('./routes/sell'));
-app.use('/finance', require('./routes/changePassword'));
-app.use('/finance', require('./routes/register'));
-app.use('/finance', require('./routes/logout'));
-
+// ROUTES
+app.use('/finance', require('./src/routes/index'));
+app.use('/finance', require('./src/routes/buy'));
+app.use('/finance', require('./src/routes/history'));
+app.use('/finance', require('./src/routes/login'));
+app.use('/finance', require('./src/routes/quote'));
+app.use('/finance', require('./src/routes/sell'));
+app.use('/finance', require('./src/routes/changePassword'));
+app.use('/finance', require('./src/routes/register'));
+app.use('/finance', require('./src/routes/logout'));
 
 // STARTING SERVER
 app.listen(3000, () => {

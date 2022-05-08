@@ -1,4 +1,30 @@
-## RESTful route
+# Finance
+
+Finance Web App created with NodeJS, Express and MySQL.
+
+This app is heavily inspired in CS50's Finance: https://cs50.harvard.edu/x/2022/psets/9/
+
+I completed the CS50 course a few months ago. Since then I've been learning web development with JavaScript, using NodeJS and Express.
+
+The original "CS50 Finance" project was made with Python, Flask and SQLite3. It was very challenging, but even then, a significant part of the code was already writen in the starter code. I didn't really understand how to create sessions, make calls to external API services, connect to the database (in a more standard way), flash messages and a lot more stuff that's mostly "ready-made" in the starter files.
+
+So, after a few months of learning NodeJS, I thought it was a good idea (a test of sorts) to try and re-create the project, but using JavaScript + NodeJS instead of Python + Flask. I wanted to build the project from scratch, so I could understand more clearly how a Web App is structured, how are all it's parts connected with each other, what are some if it's important mechanisms, what good practices should be followed, etc.
+
+### Some topics that I understand more clearly:
+
+- RESTful routes
+- CRUD operations
+- Separation of concerns
+    - Got the routes grouped on it's own folder, connected to the main app.js file
+    - Got some helper functions to it's own folder, so the routes are less cluttered
+- Middleware
+- Creating sessions
+- Connecting to the database with an ORM
+- Pulling the DB models from an already created DB
+- Async & Await (async JavaScript)
+- Security. Using CSRF Tokens, hashing the passwords
+
+## RESTful routes
 
 | NAME            | PATH                    | VERB   | PURPOSE                              |
 |-----------------|-------------------------|--------|--------------------------------------|
@@ -19,21 +45,21 @@
 
 ## Helper Functions
 
-- **lookup.js**: Simplemente se encarga de obtener la información financiera de algún símbolo, la cual obtiene de IEX.
+- **authenticate()**: Checks if a password is correct.
 
-- **usd.jd**: Formatea un float como USD
+- **lookup()**: Gets stock informations from IEX.
 
-- **requireLogin.js**: Función para usar como middleware para requerir login en todas las rutas que lo requiran(las "protege")
+- **parseDateTime()**: Converts the DATE object from the DB into a nice string
 
-- **parseDateTime**: Función para convertir objeto DATE de DB en string bonito, para no necesitar toda esa lógica en el template
+- **requireLogin()**: Function to be used as middleware to require a logged in status before entering some routes. If the user is not logged in, this functions redirects to the login page.
 
-- **authenticate**: Función que chequea si el password es correcto (login route)
+- **usd()**: Formats a float as USD currency.
+
 
 ### CHANGES 02-05-2022
 - Sessions, register user, login, logout ✔️ Done! But the user is logged out when rebooting the server
 - Completed all the missing routes and fixed all the templates
-- Fixed: Need to send context to res.render() calls even if the user is not logged in. The templates need the "user" variable with "undefined" value ✔️
-- 
+- Need to send context to res.render() calls even if the user is not logged in. The templates need the "user" variable with "undefined" value ✔️
 
 ### CHANGES 03-05-2022
 - Created **authenticate** helper function (for login and change password routes)
@@ -55,7 +81,6 @@
     - Pass a string created with `${req.session.firstName} ${req.session.lastName}` to all the res.render() calls, so it's available to show which user is currently logged in
     - **To improve**: *Redundancy keeps getting worse. Now I need to pass this string to every single res render call, because it´s needed even if the user is not logged in, because the variable is called in a partial (view) that's always present, so the variable will always be checked.*
 
-
 ### CHANGES 06-05-2022
 - Implemented some error checking in the "buy" route, but there's a ton of error checking that's still needed at every corner.
 - Replaced apology pages with flash messages, staying in the same page instead
@@ -66,25 +91,28 @@
 - Passing different title to all views
 - Favicon
 - Using bootstrap from downloaded files instead of link
-- 
+- **File structure clean up**: Created **/src** folder and moved there **/helpers**, **/public**, **/routes**. Tried to move **/views** there too, but I get some weird error from VSCode, so I´ll leave it alone for now. VSCode automatically handled most of the connections between the files. Amazing!
 
-### TODO
-- More and better error checking
-- SEED DB - Need to create a file to seed the DB with 3 users, each with at least 8 stocks, and a history that spans at least a few weeks... So I can try some interesting features with the history later
-- Clean up structure of the files inside /Finance-Node folder... put stuff in /src folder ??
-- Clean up res.render() context, theres a lot of redundancy of the same stuff always being sent. Maybe create an object?
-- Apply the *requireLogin* and *csrfProtection* middlewares in a better way, there's redundancy by putting them in all the routes, exactly the same way
-- 
+### CHANGES 08-05-2022
+*Laaaaast batch of changes before Recurse Center begins!!*
+- Created **seed.js** file to populate the DB with 3 test users: alice, bob, charle. The passwords are the same as the usernames. Each one gets a few stocks and history entries.
+- Show portfolio rows in alphabetical order
+- Validate email format using search() and RegEx.
+    - Email format validation Regular Expression: https://regexr.com/3e48o
+    - **Note to self:** *I know a bit about how to build regular expressions, but it's been easy so far to quickly google the ones I needed. I wonder at what point does it become more necesary to learn how to construct this expressions by myself.*
+- Require a password with at least one uppercase letter, one lowercase letter, one number, one special character, and between 8 and 20 characters long ✔️
+    - Password Strength Regular Expression: https://www.section.io/engineering-education/password-strength-checker-javascript/
+    - **TO IMPROVE:** *An indication of this requirements is needed BEFORE the user tries su submit the register form. For now, this is handled by displaying a flash message after the user tries to register (if the password does not meet the requirements).*
 
 ### Wishlist
-- Change the design of the page so it doesn't look so similar to the CS50 version, although I should put some notice that the web app is inspired by the CS50 one
+- More and better error checking
+- Clean up **res.render()** context, theres a lot of redundancy.
+- Apply the *requireLogin* and *csrfProtection* middlewares in a better way, there's redundancy by putting them in all the routes, exactly the same way.
+- Change the design of the page so it doesn't look so similar to the CS50 version, although I should put some notice that the web app is inspired by CS50's Finance
 - Buy / Sell stocks directly in the index page
-- Require a password with at least one uppercase letter, one lowercase letter, one number, one special character, and between 8 and 20 characters long
 - "Sell Out" button to sell all shares from one stock
 - If you click one stock, go to a page with more detailed information
 - Filter in the history page (Client side JS?)
-- 
 
 ### Curiosities
 - Even in POST routes, if I return after rendering a template (or calling res.send), then it seems the form data wont be re-submitted if the user reloads the page. That's a simple solution. *Any reason not to do it that way?*
-- 

@@ -13,7 +13,6 @@ const lookup = require('../helpers/lookup.js');
 const usd = require('../helpers/usd.js');
 const requireLogin = require('../helpers/requireLogin.js');
 
-
 /*
     ██████╗     ██╗   ██╗    ██╗   ██╗
     ██╔══██╗    ██║   ██║    ╚██╗ ██╔╝

@@ -72,6 +72,22 @@ router.post('/register', csrfProtection, async (req, res) => {
         return;
     }
 
+    // Check for password strength
+    // Require at least one upper case, one lower case, one digit, one spacial character, 8 characters long.
+    const pattern = "(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[^A-Za-z0-9])(?=.{8,})";
+    if (password.search(pattern) < 0) {
+        req.flash('failure', 'Password must have at least: 1 uppercase, 1 lowercase, 1 digit, 1 special character, 8 characters long.');
+        res.redirect('/finance/register');
+        return;
+    }
+
+    // Check if email has a valid format
+    if (email.search(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/g) < 0) {
+        req.flash('failure', 'Invalid email');
+        res.redirect('/finance/register');
+        return;
+    }
+
     // Hash password
     const hash = await bcrypt.hash(password, 12);
 
