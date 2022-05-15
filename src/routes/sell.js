@@ -46,12 +46,7 @@ router.get('/sell', requireLogin, csrfProtection, async (req, res) => {
     res.render('finance/sell', {
         title: "Sell",
         symbols,
-        user: req.session.userID,
-        username: req.session.username,
         csrfToken: req.csrfToken(),
-        success: req.flash("success"),
-        failure: req.flash("failure"),
-        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 }) // ✔️
 

@@ -31,13 +31,8 @@ router.get('/history', requireLogin, async (req, res) => {
     res.render('finance/history', {
         title: "History",
         userHistory,
-        user: req.session.userID,
-        username: req.session.username,
         usd,
         parseDateTime,
-        success: req.flash("success"),
-        failure: req.flash("failure"),
-        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 }); // ✔️:⭐⭐
 

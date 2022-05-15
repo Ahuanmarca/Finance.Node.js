@@ -106,11 +106,6 @@ router.get('/index', requireLogin, async (req, res) => {
         userPortfolio,
         cash: usd(parseFloat(cash)),
         grandTotal: usd(grandTotal),
-        user: req.session.userID,
-        username: req.session.username,
-        success: req.flash("success"),
-        failure: req.flash("failure"),
-        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 }); // ✔️:⭐⭐⭐⭐
 

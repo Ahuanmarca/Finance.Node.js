@@ -27,35 +27,22 @@ router.get('/quote', requireLogin, async (req, res) => {
         res.render('finance/quote', {
             title: "Quote",
             symbol: false,
-            user: req.session.userID,
-            username: req.session.username,
-            success: req.flash("success"),
-            failure: req.flash("failure"),
-            fullName: `${req.session.firstName} ${req.session.lastName}` 
         });
 
     } else {
         // Si existe query, valida y responde con info o apology
         let symbol = query.toUpperCase();
         const stockInfo = await lookup(symbol);
-        // console.log(stockInfo)
 
         if (stockInfo) {
-            res.render('finance/quote', {
+            return res.render('finance/quote', {
                 title: "Quote",
                 symbol: stockInfo,
                 usd,
-                user: req.session.userID,
-                username: req.session.username,
-                success: req.flash("success"),
-                failure: req.flash("failure"),
-                fullName: `${req.session.firstName} ${req.session.lastName}` 
-
             });
         } else {
             req.flash('failure', 'Invalid Symbol');
-            res.redirect('/finance/flash');
-            return;
+            return res.redirect('/finance/quote');
         }
     }
 }); // ✔️:⭐⭐⭐⭐

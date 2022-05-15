@@ -28,12 +28,7 @@ router.get('/register', csrfProtection, (req, res) => {
 
     res.render('finance/register', {
         title: "Register",
-        user: req.session.userID,
-        username: req.session.username,
         csrfToken: req.csrfToken(),
-        success: req.flash("success"),
-        failure: req.flash("failure"),
-        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 });
 

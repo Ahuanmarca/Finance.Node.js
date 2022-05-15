@@ -31,12 +31,7 @@ const authenticate = require('../helpers/authenticate.js');
 router.get('/changePassword', requireLogin, csrfProtection, (req, res) => {
     res.render('finance/changePassword', {
         title: "Change Password",
-        user: req.session.userID,
-        username: req.session.username,
         csrfToken: req.csrfToken(),
-        success: req.flash("success"),
-        failure: req.flash("failure"),
-        fullName: `${req.session.firstName} ${req.session.lastName}` 
     });
 })
 
