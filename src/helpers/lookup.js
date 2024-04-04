@@ -1,3 +1,4 @@
+// TODO: Find free alternative to IEX on 2024
 const axios = require('axios');
 
 async function lookup(symbol) {
@@ -5,8 +6,8 @@ async function lookup(symbol) {
     // Look up quote for symbol.
     
     // Contact API
-    // const api_key = 'pk_5d590d49563b4b12a0bf0181da6f5f90'
-    const api_key = process.env.API_KEY;
+    const api_key = 'pk_5d590d49563b4b12a0bf0181da6f5f90'
+    // const api_key = process.env.API_KEY;
     const url = `https://cloud.iexapis.com/stable/stock/${symbol}/quote?token=${api_key}`
     try {
         const response = await axios.get(url);

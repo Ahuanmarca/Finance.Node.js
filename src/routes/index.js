@@ -67,8 +67,8 @@ router.get('/index', requireLogin, async (req, res) => {
         const shares = portfolioRow.shares;
 
         // Use symbols to lookup price and name
-        const data = await lookup(symbol);
-        const name = data.name;
+        const data = await lookup(symbol); console.debug(data);
+        const name = data.name; // ! ERROR: Returns null
         const price = data.price;
 
         // Use price and shares to get total

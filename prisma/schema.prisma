@@ -3,7 +3,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -12,11 +12,11 @@ model portfolios {
   user_id  Int
   stock_id Int
   shares   Int
-  stocks   stocks @relation(fields: [stock_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "portfolios_ibfk_2")
-  users    users  @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "portfolios_ibfk_1")
+  stocks   stocks @relation(fields: [stock_id], references: [id])
+  users    users  @relation(fields: [user_id], references: [id])
 
-  @@index([stock_id], map: "stock_id")
-  @@index([user_id], map: "user_id")
+  @@index([stock_id])
+  @@index([user_id])
 }
 
 model stocks {
@@ -32,20 +32,20 @@ model transacciones {
   user_id    Int
   stock_id   Int
   shares     Int
-  price      Float    @db.Float
+  price      Float
   p_datetime DateTime @default(now()) @db.Timestamp(0)
-  stocks     stocks   @relation(fields: [stock_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transacciones_ibfk_2")
-  users      users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "transacciones_ibfk_1")
+  stocks     stocks   @relation(fields: [stock_id], references: [id])
+  users      users    @relation(fields: [user_id], references: [id])
 
-  @@index([stock_id], map: "stock_id")
-  @@index([user_id], map: "user_id")
+  @@index([stock_id])
+  @@index([user_id])
 }
 
 model users {
   id            Int             @id @default(autoincrement())
-  username      String          @unique(map: "username") @db.VarChar(12)
+  username      String          @unique @db.VarChar(12)
   hash          String          @db.VarChar(255)
-  cash          Decimal         @default(10000.0000) @db.Decimal(19, 4)
+  cash          Decimal         @default(10000.0000)
   first_name    String          @db.VarChar(255)
   last_name     String          @db.VarChar(255)
   email         String          @db.VarChar(320)
